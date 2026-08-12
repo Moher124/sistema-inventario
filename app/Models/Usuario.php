@@ -21,6 +21,7 @@ class Usuario extends Authenticatable
         return [
             'activo' => 'boolean',
             'creado_el' => 'datetime',
+            'password_hash' => 'hashed',
         ];
     }
 
