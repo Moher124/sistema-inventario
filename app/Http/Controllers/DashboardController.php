@@ -54,20 +54,20 @@ class DashboardController extends Controller
             ->sortBy('stock')
             ->values();
 
-        // 4. NUEVO: Top 5 Productos Más Vendidos del Mes
+
         $topProductos = VentaDetalle::whereRelation('venta', 'anulada', false)
-            ->whereRelation('venta', 'fecha_venta', '>=', $inicioMes)
-            ->whereRelation('venta', 'fecha_venta', '<=', $finMes)
-            ->with('producto:id_producto,nombre')
-            ->select('id_producto', DB::raw('SUM(cantidad_vendida) as cantidad_total'))
-            ->groupBy('id_producto')
-            ->orderByDesc('cantidad_total')
-            ->limit(5)
-            ->get()
-            ->map(fn ($detalle) => [
-                'nombre' => $detalle->producto?->nombre ?? 'Producto Eliminado',
-                'cantidad' => (int) $detalle->cantidad_total,
-            ]);
+        ->whereRelation('venta', 'fecha_venta', '>=', $inicioMes)
+        ->whereRelation('venta', 'fecha_venta', '<=', $finMes)
+        ->with('producto:id_producto,nombre')
+        ->select('id_producto', DB::raw('SUM(cantidad_vendida * precio_unitario) as total_recaudado'))
+        ->groupBy('id_producto')
+        ->orderByDesc('total_recaudado')
+        ->limit(5)
+        ->get()
+        ->map(fn ($detalle) => [
+            'nombre' => $detalle->producto?->nombre ?? 'Producto Eliminado',
+            'total' => (float) $detalle->total_recaudado, //Envia el total monetario
+        ]);
 
         // 5. NUEVO: Datos Estructurados para Gráfica (Ventas por Día del Mes actual)
         // Esto facilitará enormemente pintar una gráfica de líneas o barras en el frontend
@@ -92,7 +92,7 @@ class DashboardController extends Controller
             'totalVentasCount' => (int) $metricasVentas->total_transacciones,
             'productosStockBajo' => $productosStockBajo,
             'topProductos' => $topProductos,
-            'datosGraficaVentas' => $ventasPorDia, // Listo para tu librería de gráficos
+            'datosGraficaVentas' => $ventasPorDia, // librería de graficos
         ]);
     }
 }

@@ -11,7 +11,7 @@ type ProductoStockBajo = {
 
 type TopProducto = {
     nombre: string;
-    cantidad: number;
+    total: number;
 };
 
 type DatoGrafica = {
@@ -50,7 +50,6 @@ function formatQ(valor: number): string {
     return valor.toLocaleString('es-GT', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-// Configuración reactiva optimizada para la gráfica de ApexCharts
 const chartOptions = computed(() => ({
     chart: {
         id: 'ventas-diarias',
@@ -59,7 +58,7 @@ const chartOptions = computed(() => ({
         fontFamily: 'inherit',
         background: 'transparent',
     },
-    colors: ['#10b981'], // Verde esmeralda de Tailwind
+    colors: ['#10b981'], // Verde esmeralda
     stroke: { curve: 'smooth', width: 2 },
     fill: {
         type: 'gradient',
@@ -84,7 +83,7 @@ const chartOptions = computed(() => ({
         }
     },
     grid: { borderColor: '#e5e7eb20', strokeDashArray: 4 },
-    theme: { mode: 'dark' }, // Cambiar dinámicamente si manejas tema global
+    theme: { mode: 'dark' },
     tooltip: { y: { formatter: (val: number) => `Q${formatQ(val)}` } }
 } as any));
 
@@ -152,7 +151,7 @@ const chartSeries = computed(() => [{
             </div>
         </div>
 
-        <!-- Sección Contenedora de la Gráfica Comercial -->
+
         <div class="rounded-xl border border-sidebar-border/70 p-4 dark:border-sidebar-border">
             <div class="mb-4 flex items-center gap-2">
                 <TrendingUp class="size-4 text-emerald-500" />
@@ -166,9 +165,8 @@ const chartSeries = computed(() => [{
             </div>
         </div>
 
-        <!-- Paneles de Tablas Inferiores (Stock Bajo vs Top Ventas) -->
         <div class="grid gap-4 md:grid-cols-2">
-            <!-- Productos con Stock Bajo -->
+
             <div class="rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
                 <div class="flex items-center gap-2 border-b border-sidebar-border/70 p-4 dark:border-sidebar-border">
                     <AlertTriangle class="size-4 text-amber-500" />
@@ -198,7 +196,7 @@ const chartSeries = computed(() => [{
                 </table>
             </div>
 
-            <!-- Top 5 Productos Más Vendidos -->
+
             <div class="rounded-xl border border-sidebar-border/70 dark:border-sidebar-border">
                 <div class="flex items-center gap-2 border-b border-sidebar-border/70 p-4 dark:border-sidebar-border">
                     <Award class="size-4 text-blue-500" />
@@ -215,7 +213,7 @@ const chartSeries = computed(() => [{
                             <td class="p-3 font-medium text-muted-foreground w-10">#{{ idx + 1 }}</td>
                             <td class="p-3">{{ producto.nombre }}</td>
                             <td class="p-3 text-right font-semibold text-emerald-600">
-                                {{ producto.cantidad }} uds.
+                                Q{{ formatQ(producto.total) }}
                             </td>
                         </tr>
                         <tr v-if="topProductos.length === 0">

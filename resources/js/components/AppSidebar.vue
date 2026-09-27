@@ -39,7 +39,7 @@ const mainNavItems = computed<NavItem[]>(() => {
 const footerNavItems: NavItem[] = [
     {
         title: 'Repository',
-        href: 'https://github.com/laravel/vue-starter-kit',
+        href: 'https://github.com/Moher124/sistema-inventario',
         icon: FolderGit2,
     },
     {

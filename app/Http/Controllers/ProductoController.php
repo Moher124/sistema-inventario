@@ -85,6 +85,8 @@ class ProductoController extends Controller
     {
         $tipoProducto = $request->query('tipo_producto', '');
 
+
+        // Extrae las primeras tres letras del tipo de producto, eliminando caracteres no alfabéticos y convirtiéndolas a mayúsculas
         $letras = strtoupper(preg_replace('/[^a-zA-Z]/', '', $tipoProducto));
         $prefijo = str_pad(substr($letras, 0, 3), 3, 'X');
 
