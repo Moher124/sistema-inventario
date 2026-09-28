@@ -18,20 +18,19 @@ COPY . .
 # Instalar dependencias de PHP
 RUN composer install --no-dev --optimize-autoloader --ignore-platform-reqs
 
-# Forzar la instalación de dependencias de Node e intentar la compilación de Vite
+# Generar archivo de SQLite si no existe previamente
+RUN touch database/database.sqlite && chmod 777 database/database.sqlite
+
+# Instalar dependencias de Node
 RUN npm install --legacy-peer-deps
 
-# Generar manifiesto válido de respaldo si Vite no compila
-RUN mkdir -p public/build && \
-    (npm run build || echo '{"resources/css/app.css":{"file":"assets/app.css","src":"resources/css/app.css","isEntry":true},"resources/js/app.js":{"file":"assets/app.js","src":"resources/js/app.js","isEntry":true}}' > public/build/manifest.json)
+# Compilar frontend
+RUN npm run build || true
 
-# Asegurar permisos en almacenamiento y base de datos
-RUN chmod -R 777 storage bootstrap/cache
+# Permisos en storage y cache
+RUN chmod -R 777 storage bootstrap/cache database
 
 EXPOSE 8080
 
-# Crear la base de datos SQLite si no existe, correr migraciones y arrancar la app
-CMD touch database/database.sqlite && \
-    chmod 777 database/database.sqlite && \
-    php artisan migrate --force && \
-    php artisan serve --host=0.0.0.0 --port=8080
+# Comando de arranque tolerante a fallos de migración
+CMD php artisan migrate --force || true && php artisan serve --host=0.0.0.0 --port=8080
