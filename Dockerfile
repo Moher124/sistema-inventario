@@ -30,4 +30,4 @@ RUN chmod -R 777 storage bootstrap/cache database
 EXPOSE 8080
 
 # Comando de arranque: ejecuta migraciones con seeders y levanta el servidor
-CMD sh -c "touch database/database.sqlite && chmod 777 database/database.sqlite && php artisan migrate:fresh --seed --force && php artisan serve --host=0.0.0.0 --port=8080"
+CMD sh -c "touch database/database.sqlite && chmod 777 database/database.sqlite && php artisan migrate --force && php artisan db:seed --force && php artisan serve --host=0.0.0.0 --port=8080"
