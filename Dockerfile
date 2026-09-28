@@ -7,17 +7,21 @@ RUN apt-get update && apt-get install -y \
     && apt-get install -y nodejs \
     && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd
 
-# Copiar Composer desde la imagen oficial
+# Copiar Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
 
-# Copiar archivos del proyecto
+# Copiar archivos
 COPY . .
 
-# Instalar dependencias de PHP y Frontend
+# Instalar dependencias de PHP
 RUN composer install --no-dev --optimize-autoloader --ignore-platform-reqs
-RUN npm install && npm run build
+
+# Configurar entorno de Node y compilar assets
+ENV NODE_ENV=production
+RUN npm ci || npm install --legacy-peer-deps
+RUN npm run build
 
 EXPOSE 8080
 
