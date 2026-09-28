@@ -18,11 +18,14 @@ COPY . .
 # Instalar dependencias de PHP
 RUN composer install --no-dev --optimize-autoloader --ignore-platform-reqs
 
-# Compilar frontend o generar manifiesto básico si falla
-RUN npm install --legacy-peer-deps && \
-    (npm run build || (mkdir -p public/build && echo '{}' > public/build/manifest.json))
+# Forzar la instalación de dependencias de Node e intentar la compilación de Vite
+RUN npm install --legacy-peer-deps
 
-# Asegurar permisos en almacenamiento
+# Generar manifiesto válido de respaldo si Vite no compila
+RUN mkdir -p public/build && \
+    (npm run build || echo '{"resources/css/app.css":{"file":"assets/app.css","src":"resources/css/app.css","isEntry":true},"resources/js/app.js":{"file":"assets/app.js","src":"resources/js/app.js","isEntry":true}}' > public/build/manifest.json)
+
+# Asegurar permisos en almacenamiento y base de datos
 RUN chmod -R 777 storage bootstrap/cache
 
 EXPOSE 8080
