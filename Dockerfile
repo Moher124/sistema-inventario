@@ -1,6 +1,6 @@
 FROM php:8.4-cli
 
-# Instalar dependencias de sistema y Node.js
+# Instalar dependencias del sistema y Node.js
 RUN apt-get update && apt-get install -y \
     git unzip zip libpng-dev libonig-dev libxml2-dev curl \
     && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
@@ -12,7 +12,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
 
-# Copiar archivos
+# Copiar archivos del proyecto
 COPY . .
 
 # Instalar dependencias de PHP
@@ -21,9 +21,13 @@ RUN composer install --no-dev --optimize-autoloader --ignore-platform-reqs
 # Intentar compilación de frontend tolerante a errores
 RUN npm install --legacy-peer-deps && (npm run build || true)
 
-# Asegurar permisos de directorios de almacenamiento de Laravel
+# Asegurar permisos en almacenamiento
 RUN chmod -R 777 storage bootstrap/cache
 
 EXPOSE 8080
 
-CMD php artisan serve --host=0.0.0.0 --port=8080
+# Crear la base de datos SQLite si no existe, correr migraciones y arrancar la app
+CMD touch database/database.sqlite && \
+    chmod 777 database/database.sqlite && \
+    php artisan migrate --force && \
+    php artisan serve --host=0.0.0.0 --port=8080
