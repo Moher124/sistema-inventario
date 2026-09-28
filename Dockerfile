@@ -15,7 +15,7 @@ WORKDIR /app
 # Copiar archivos del proyecto
 COPY . .
 
-# Instalar dependencias de PHP
+# Instalar dependencias de PHP (sin dev: Faker no se instala en producción)
 RUN composer install --no-dev --optimize-autoloader --ignore-platform-reqs
 
 # Instalar dependencias de Node y compilar assets
@@ -29,5 +29,6 @@ RUN chmod -R 777 storage bootstrap/cache database
 
 EXPOSE 8080
 
-# Comando de arranque: ejecuta migraciones con seeders y levanta el servidor
-CMD sh -c "touch database/database.sqlite && chmod 777 database/database.sqlite && php artisan migrate --force && php artisan db:seed --force && php artisan serve --host=0.0.0.0 --port=8080"
+# Arranque: migraciones (SIN seeder) y servidor.
+# Render define $PORT; si no existe, usa 8080.
+CMD sh -c "touch database/database.sqlite && chmod 777 database/database.sqlite && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=${PORT:-8080}"
