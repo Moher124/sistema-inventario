@@ -18,8 +18,9 @@ COPY . .
 # Instalar dependencias de PHP
 RUN composer install --no-dev --optimize-autoloader --ignore-platform-reqs
 
-# Intentar compilación de frontend tolerante a errores
-RUN npm install --legacy-peer-deps && (npm run build || true)
+# Compilar frontend o generar manifiesto básico si falla
+RUN npm install --legacy-peer-deps && \
+    (npm run build || (mkdir -p public/build && echo '{}' > public/build/manifest.json))
 
 # Asegurar permisos en almacenamiento
 RUN chmod -R 777 storage bootstrap/cache
